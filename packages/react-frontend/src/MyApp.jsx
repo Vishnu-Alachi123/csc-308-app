@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import Table from "./table";
+import Form from "./form";
 
   function MyApp() {
 
@@ -29,11 +30,16 @@ import Table from "./table";
         setCharacters(updated)
     }
 
+    function updateList(person){
+        setCharacters([...characters, person]);
+    }
+
     return (
         <div className="container">
           <Table 
           characterData={characters} 
           removeOneCharacter={removeOneCharacter}/>
+          <Form handleSubmit = {updateList}/>
         </div>
       );
   }
