@@ -83,7 +83,8 @@ import SearchBar from "./SearchBar"
 
     function updateList(person) { 
       postUser(person)
-        .then(() => getUsers())
+        .then((res) => res.json())
+        .then((added_person) => setCharacters([...characters,added_person]))
         .catch((error) => {
           console.log(error);
         })
