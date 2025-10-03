@@ -1,9 +1,11 @@
 // backend.js
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+app.use(cors());
 app.use(express.json());
 
 const users = {
@@ -40,6 +42,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+function generateID() {
+    return Math.floor(Math.random() * 1000);
+}
+
 const findUserByName = (name) => {
     return users["users_list"].filter(
       (user) => user["name"] === name
@@ -73,16 +79,17 @@ const job = req.query.job;
 if (name != undefined) {
     if (job != undefined) {
         let result = findUserByNameJob(name, job);
-        result = {user_list: result};
-        res.send(result);
+        result = {users_list: result};
+        res.status(200).send(result);
     }
     else{
         let result = findUserByName(name);
         result = { users_list: result };
-        res.send(result);
+        res.status(200).send(result);
     }
 } else {
-    res.send(users);
+    console.log(users)
+    res.status(200).send(users);
 }
 });
 
@@ -93,7 +100,7 @@ app.get("/users/:id", (req, res) => {
     if (result === undefined) {
         res.status(404).send("Resource not found.");
     } else {
-        res.send(result);
+        res.status(200).send(result);
     }
 });
 
@@ -103,14 +110,15 @@ app.delete("/users/:id", (req, res) => {
     if (result === undefined) {
         res.status(404).send("Resource not found.");
     } else {
-        res.send(result);
+        res.status(202).send(result);
     }
 });
 
 app.post("/users", (req, res) => {
-const userToAdd = req.body;
-addUser(userToAdd);
-res.send();
+    const userToAdd = req.body;
+    userToAdd["id"] = generateID();
+    addUser(userToAdd);
+    res.status(201).send();
 });
 
 app.listen(port, () => {
