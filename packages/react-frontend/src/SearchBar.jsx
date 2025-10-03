@@ -21,26 +21,29 @@ function SearchBar(props) {
 
 
     return (
-        <form>
-            <label htmlFor="name">Name</label>
-            <input 
-            type="text"
-            name="name"
-            id="name"
-            value={search.name}
-            onChange={handleChange}>
-            </input>
-            <label htmlFor="job">Job</label>
-            <input 
-            type="text"
-            name="job"
-            id="job"
-            value={search.job}
-            onChange={handleChange}>
-            </input>
-            <input type="button" value="Submit" onClick={submitForm} />
-            <input type="button" value="Reset" onClick={submitForm}/>
-        </form>
+        <div
+            ><h1>Search Bar</h1>
+            <form>
+                <label htmlFor="name">Name</label>
+                <input 
+                type="text"
+                name="name"
+                id="name"
+                value={search.name}
+                onChange={handleChange}>
+                </input>
+                <label htmlFor="job">Job</label>
+                <input 
+                type="text"
+                name="job"
+                id="job"
+                value={search.job}
+                onChange={handleChange}>
+                </input>
+                <input type="button" value="Submit" onClick={submitForm} />
+                <input type="button" value="Reset" onClick={submitForm}/>
+            </form>
+        </div>
         )
 }
 export default SearchBar;

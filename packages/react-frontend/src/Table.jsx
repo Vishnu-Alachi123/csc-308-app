@@ -38,12 +38,15 @@ function TableHeader() {
   
   function Table(props) {
       return (
+        <div>
+          <h1>Table</h1>
         <table>
           <TableHeader />
           <TableBody 
           characterData={props.characterData}
           removeOneCharacter={props.removeOneCharacter} />
         </table>
+        </div>
       );
   }
   export default Table;
