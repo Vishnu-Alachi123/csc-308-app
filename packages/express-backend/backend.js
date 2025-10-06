@@ -118,7 +118,7 @@ app.post("/users", (req, res) => {
     const userToAdd = req.body;
     userToAdd["id"] = generateID();
     addUser(userToAdd);
-    res.status(201).send();
+    res.status(201).send(userToAdd);
 });
 
 app.listen(port, () => {
