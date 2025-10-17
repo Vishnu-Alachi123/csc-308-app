@@ -1,128 +1,101 @@
-// backend.js
-import express from "express";
+import express, { json } from "express";
 import cors from "cors";
+import userService from "./user-services.js";
+
+const {
+    addUser,
+    getUsers,
+    findUserById,
+    findUserByName,
+    findUserByJob,
+    deleteUserById,
+    findUserByNameAndJob
+} = userService;
+
 
 const app = express();
 const port = 8000;
-
+  
 app.use(cors());
 app.use(express.json());
-
-const users = {
-    users_list: [
-      {
-        id: "xyz789",
-        name: "Charlie",
-        job: "Janitor"
-      },
-      {
-        id: "abc123",
-        name: "Mac",
-        job: "Bouncer"
-      },
-      {
-        id: "ppp222",
-        name: "Mac",
-        job: "Professor"
-      },
-      {
-        id: "yat999",
-        name: "Dee",
-        job: "Aspring actress"
-      },
-      {
-        id: "zap555",
-        name: "Dennis",
-        job: "Bartender"
-      }
-    ]
-  };
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+  
+app.get("/users", (req,res) => {
+    const name = req.query.name;
+    const job = req.query.job;
+    if(name && job)
+    {
+        findUserByNameAndJob(name,job)
+        .then((users) => {
+            if(users && users.length > 0) {
+                res.status(200).send({ users_list: users }); // Send the filtered result
+        } else {
+          res.status(404).send("User not found with the specified name and job.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error while fetching user by name and job:", error);
+        res.status(500).send("Error fetching user from database.");
+      });
+    } 
+    else {
+    getUsers(name, job)
+      .then((users) => {
+        res.send({ users_list: users });
+      })
+      .catch((error) => {
+        console.error("Error while fetching users:", error);
+        res.status(500).send("Error fetching users from database.");
+      });
+  }
 });
 
-function generateID() {
-    return Math.floor(Math.random() * 1000);
-}
+app.get("/users/:id", (req,res) => {
+    const _id = req.params["id"];
+    findUserById(_id)
+    .then((user) => {
+        if(user) {res.send(user)}
+        else(res.status(404).send("User not found in database"))
+    })
+    .catch((error) => {
+        console.error("Error while finding user : ", error);
+        res.status(404).send("Error while finding user in database")
+    })
+})
 
-const findUserByName = (name) => {
-    return users["users_list"].filter(
-      (user) => user["name"] === name
-    );
-  };
-
-const findUserByNameJob = (name,job) => {
-return users["users_list"].filter(
-    (user) => user["name"] === name && user["job"] === job
-);
-};
-  
-const findUserById = (id) =>
-users["users_list"].find((user) => user["id"] === id);
-
-const removeUserById = (id) => {
-    const initialUserLength = users["users_list"].length;
-    users["users_list"] = users["users_list"].filter((user) => user["id"] != id)
-    const newUserLength = users["users_list"].length
-    return initialUserLength > newUserLength;
-}
-  
-const addUser = (user) => {
-    users["users_list"].push(user);
-    return user;
-};
-
-app.get("/users", (req, res) => {
-const name = req.query.name;
-const job = req.query.job;
-if (name != undefined) {
-    if (job != undefined) {
-        let result = findUserByNameJob(name, job);
-        result = {users_list: result};
-        res.status(200).send(result);
-    }
-    else{
-        let result = findUserByName(name);
-        result = { users_list: result };
-        res.status(200).send(result);
-    }
-} else {
-    console.log(users)
-    res.status(200).send(users);
-}
-});
-
-
-app.get("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        res.status(200).send(result);
-    }
+app.post("/users",(req,res) =>{
+    const new_user = req.body;
+    addUser(new_user)
+    .then((added_user) => {
+        res.status(201).send(added_user)
+    })
+    .catch((error) => {
+        console.error("Error while inserting user in Database :",error);
+        res.status(500).send("Error while inserting user")
+    })
 });
 
 app.delete("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = removeUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        res.status(202).send(result);
-    }
+    const userId = req.params.id;
+    deleteUserById(userId)
+    .then((deleteduser) => {
+        if(deleteduser)
+        {
+            res.status(204).send(`User with id ${userId} deleted.`)
+        }
+        else 
+        {
+            res.status(404).send(`User with id ${userId} not found.`);
+        }
+    })
+    .catch((error) => 
+    {
+        console.error(`Error while deleting user with id ${userId}:`, error);
+        res.status(500).send("Error while deleting user");
+    })
 });
 
-app.post("/users", (req, res) => {
-    const userToAdd = req.body;
-    userToAdd["id"] = generateID();
-    addUser(userToAdd);
-    res.status(201).send(userToAdd);
-});
 
-app.listen(port, () => {
-  console.log(
-    `Example app listening at http://localhost:${port}`
+app.listen(port, ()=> {
+    console.log(`Example app listening at http://localhost:${port}`
   );
 });

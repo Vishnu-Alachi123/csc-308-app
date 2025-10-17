@@ -33,8 +33,8 @@ import SearchBar from "./SearchBar"
       return promise;
     }
 
-    function deleteUser(id){
-      const promise = fetch(fetchAPI + id,{
+    function deleteUser(_id){
+      const promise = fetch(fetchAPI + _id,{
         method: "DELETE",
         headers: {
           "Content-Type" : "application/json",
@@ -47,8 +47,8 @@ import SearchBar from "./SearchBar"
       getUsers();
     }, [] );
 
-    function removeOneCharacter(id) {
-      deleteUser(id).
+    function removeOneCharacter(_id) {
+      deleteUser(_id).
       then(() => setCharacters([...characters]))
       .then(() => getUsers())
       .catch((error) => console.log(error))
